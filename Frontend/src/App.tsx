@@ -1,37 +1,57 @@
 import type { Todo } from "./components/types/todo";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "./components/ui/input";
 import { Button } from "./components/ui/button";
 import TodoListItem from "./components/TodoListItem";
+import axios from "axios";
 
 const App = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [title, setTitle] = useState<string>("");
-  const addTodo = (title: string) => {
-    setTodos([...todos, { id: crypto.randomUUID(), title, completed: false }]);
-    setTitle("");
+
+  useEffect(() => {
+    AllTodos();
+  }, []);
+
+  const AllTodos = async () => {
+    const response = await axios.get("http://localhost:3000/todos");
+    console.log(response.data);
+    setTodos(response.data);
   };
 
-  const updateTodo = (id: string, title: string) => {
-    setTodos(
-      todos.map((todo) => {
-        if (todo.id === id) return { ...todo, title };
-        return todo;
-      })
-    );
+  const addTodo = async (title: string) => {
+    try {
+      const response = await axios.post("http://localhost:3000/add-todo", {
+        title,
+      });
+      console.log(response.data);
+      setTodos(response.data);
+      setTitle("");
+    } catch (e) {
+      console.log("error", e);
+    }
   };
 
-  const deleteTodo = (id: string) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
+  const updateTodo = async (id: string, title: string) => {
+    try {
+      const response = await axios.put(`http://localhost:3000/update/${id}`, {
+        title,
+      });
+      console.log(response.data);
+      setTodos(response.data);
+    } catch (error) {
+      console.log("error", error);
+    }
   };
 
-  const completeTodo = (id: string) => {
-    setTodos(
-      todos.map((todo) => {
-        if (todo.id === id) return { ...todo, completed: true };
-        return todo;
-      })
-    );
+  const deleteTodo = async (id: string) => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/delete/${id}`);
+      setTodos(response.data);
+      console.log(response.data);
+    } catch (err) {
+      console.log("error", err);
+    }
   };
 
   return (
@@ -42,13 +62,12 @@ const App = () => {
           <Input value={title} onChange={(e) => setTitle(e.target.value)} />
           <Button onClick={() => addTodo(title)}>Add</Button>
         </div>
-        {todos.map((todo, key) => {
+        {todos.map((todo) => {
           return (
             <TodoListItem
-              key={key}
+              key={todo.id}
               todo={todo}
               updateTodo={updateTodo}
-              completeTodo={completeTodo}
               deleteTodo={deleteTodo}
             />
           );
