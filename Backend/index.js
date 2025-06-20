@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+
 const app = express();
 
 app.use(express.json());
@@ -15,28 +16,31 @@ app.get("/todos", (req, res) => {
   res.json(todos);
 });
 
-app.post("/add-todo", (req, res) => {
-  const { title } = req.body;
+app.post("/todo", (req, res) => {
   const id = crypto.randomUUID();
+  const title = req.body.title;
   const completed = false;
-  const newTodo = { id, title, completed };
-  todos.push(newTodo);
+
+  const todo = { id, title, completed };
+  todos.push(todo);
   res.json(todos);
 });
 
-app.delete("/delete/:id", (req, res) => {
+app.delete("/todo/:id", (req, res) => {
   const id = req.params.id;
   todos = todos.filter((todo) => todo.id !== id);
   res.json(todos);
 });
 
-app.put("/update/:id", (req, res) => {
+app.put("/todo/:id", (req, res) => {
   const id = req.params.id;
   const { title } = req.body;
-  todos = todos.map((todo) => (todo.id === id ? { ...todo, title } : todo));
+  const todo = todos.find((todo) => todo.id === id);
+  if (!todo) return res.status(404).json("No record found");
+  todo.title = title;
   res.json(todos);
 });
 
 app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+  console.log("app running at 3000");
 });

@@ -21,7 +21,7 @@ const App = () => {
 
   const addTodo = async (title: string) => {
     try {
-      const response = await axios.post("http://localhost:3000/add-todo", {
+      const response = await axios.post("http://localhost:3000/todo", {
         title,
       });
       console.log(response.data);
@@ -34,7 +34,7 @@ const App = () => {
 
   const updateTodo = async (id: string, title: string) => {
     try {
-      const response = await axios.put(`http://localhost:3000/update/${id}`, {
+      const response = await axios.put(`http://localhost:3000/todo/${id}`, {
         title,
       });
       console.log(response.data);
@@ -46,7 +46,7 @@ const App = () => {
 
   const deleteTodo = async (id: string) => {
     try {
-      const response = await axios.delete(`http://localhost:3000/delete/${id}`);
+      const response = await axios.delete(`http://localhost:3000/todo/${id}`);
       setTodos(response.data);
       console.log(response.data);
     } catch (err) {
